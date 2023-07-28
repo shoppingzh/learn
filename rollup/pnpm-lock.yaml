@@ -17,6 +17,9 @@ importers:
       '@rollup/plugin-commonjs':
         specifier: ^25.0.3
         version: 25.0.3(rollup@3.26.3)
+      '@rollup/plugin-data-uri':
+        specifier: ^1.0.2
+        version: 1.0.2(rollup@3.26.3)
       '@rollup/plugin-json':
         specifier: ^6.0.0
         version: 6.0.0(rollup@3.26.3)
@@ -30,9 +33,13 @@ importers:
         specifier: ^3.26.3
         version: 3.26.3
 
+  packages/plugin-auto-install: {}
+
   packages/plugin-beep: {}
 
   packages/plugin-commonjs: {}
+
+  packages/plugin-data-uri: {}
 
   packages/plugin-json: {}
 
@@ -83,6 +90,19 @@ packages:
       glob: 8.1.0
       is-reference: 1.2.1
       magic-string: 0.27.0
+      rollup: 3.26.3
+    dev: true
+
+  /@rollup/plugin-data-uri@1.0.2(rollup@3.26.3):
+    resolution: {integrity: sha512-x+MLZsylp7DqEJ1WeUslIA8a+9o8kPrpyi+nP7Bu+j0fqAiGkUBjheR/o0/yx9+8/M1fyrAUsUMZhmuX/gIS9A==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.2(rollup@3.26.3)
       rollup: 3.26.3
     dev: true
 
