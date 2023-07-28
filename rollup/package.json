@@ -1,0 +1,24 @@
+{
+  "name": "rollup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-auto-install": "^3.0.4",
+    "@rollup/plugin-beep": "^1.0.2",
+    "@rollup/plugin-commonjs": "^25.0.3",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@types/lodash": "^4.14.196",
+    "rollup": "^3.26.3"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
