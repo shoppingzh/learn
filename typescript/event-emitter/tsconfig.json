@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true,
+    "declarationDir": "types",
+    "lib": ["ES2015", "DOM"],
+    "module": "UMD"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

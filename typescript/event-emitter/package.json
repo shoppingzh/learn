@@ -1,0 +1,13 @@
+{
+  "name": "event-emitter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "node ./dist/test.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.6.4"
+  }
+}
