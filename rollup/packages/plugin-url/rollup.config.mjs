@@ -12,7 +12,8 @@ export default defineConfig({
     url({
       limit: 0,
       destDir: 'dist',
-      publicPath: './'
+      publicPath: './',
+      fileName: '[name].[hash][extname]',
     }),
     html(),
   ]
