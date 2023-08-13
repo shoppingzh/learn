@@ -8,11 +8,13 @@ export default defineConfig({
     dir: 'dist',
     format: 'esm',
   },
+  treeshake: false,
   plugins: [
     replace({
       preventAssignment: true,
       values: {
         'CURRENT_PATH': JSON.stringify(path.resolve().replace(/\\+/g, '/')),
+        'process.env.NODE_ENV': JSON.stringify('production'),
       }
     })
   ]
