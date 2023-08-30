@@ -28,7 +28,7 @@ onMounted(() => {
   const h = tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent
   console.log(tm);
 
-  const position = [0, 0]
+  const position = [30, 100]
   const realPosition = [position[0] + tm.actualBoundingBoxLeft, position[1] + tm.actualBoundingBoxAscent]
   
   ctx.fillText(text, realPosition[0], realPosition[1])
@@ -37,7 +37,7 @@ onMounted(() => {
   ctx.save()
   ctx.strokeStyle = 'red'
   ctx.lineWidth = 2
-  ctx.strokeRect(0, 0, w, h)
+  ctx.strokeRect(position[0], position[1], w, h)
 })
 
 
