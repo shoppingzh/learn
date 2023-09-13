@@ -1,0 +1,16 @@
+{
+  "name": "pdf2json",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node ./index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pdf2json": "^3.0.4"
+  }
+}
