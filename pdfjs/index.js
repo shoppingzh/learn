@@ -1,6 +1,7 @@
 import pdfjs from 'pdfjs-dist'
 import fs from 'fs'
 
+console.log(new pdfjs.SVGGraphics());
 const buffer = fs.readFileSync('./1.pdf')
 
 let html = ``
@@ -11,15 +12,18 @@ let html = ``
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i)
-    
-    const content = await page.getTextContent({
-      includeMarkedContent: true,
-    })
-    // const tree = await page.getStructTree()
-    console.log(content);
+    const o  = page.getXfa()
+    console.log(o);
+
+
+    // const content = await page.getTextContent({
+    //   includeMarkedContent: true,
+    // })
+    // // const tree = await page.getStructTree()
+    // // console.log(content);
     // content.items.forEach(o => {
     //   console.log(o.str);
-    //   html += o.str
+    //   html += o.str + '\n'
     // })
   }
 
