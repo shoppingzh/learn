@@ -18,7 +18,7 @@ let html = ``
     // const tree = await page.getStructTree()
     // console.log(content);
     content.items.forEach(o => {
-      html += o.str + '\n'
+      html += o.str
     })
   }
 
