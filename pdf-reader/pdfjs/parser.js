@@ -6,19 +6,19 @@ export function parse(filepath) {
     const buffer = fs.readFileSync('./1.pdf')
 
     const pdf = await pdfjs.getDocument(new Uint8Array(buffer)).promise
+    let all = ''
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i)
   
       const content = await page.getTextContent({
         includeMarkedContent: true,
       })
-      const all = content.items.reduce((all, o) => {
+      content.items.forEach((o) => {
         all += o.str
-        return all
-      }, '')
+      })
 
-      resolve(all)
     }
+    resolve(all)
   })
 
 }
