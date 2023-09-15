@@ -38,9 +38,18 @@ const client = new Client({
 
   const result = await client.search({
     query: {
-      match: {
-        name: 'zxp'
+      // match: {
+      //   name: 'zxp',
+
+      // },
+      bool: {
+        must: {
+          match: {
+            name: 'zxp'
+          }
+        }
       }
+      
     }
   })
   console.log(result)
