@@ -20,25 +20,27 @@ const index = 'knowledge'
 
   const content = await parse('./1.pdf')
 
-  await client.delete({
-    index,
-    id: 'nodejs'
-  })
+  if (await client.exists({ index, id: 1})) {
+    await client.delete({
+      index,
+      id: 1
+    })
+  }
   await client.index({
     index,
-    id: 'nodejs',
+    id: 1,
     document: {
       content,
     }
   })
 
   const result = await client.search({
-    index: 'knowledge',
+    index,
     query: {
       bool: {
-        should: {
+        must: {
           match: {
-            content: '重大危险'
+            content: '政务大数据在不同政务部门间通过数据共享域实现跨组织交换'
           }
         }
       }
@@ -46,8 +48,8 @@ const index = 'knowledge'
   })
   console.log(result.hits.total)
 
-  result.hits.hits.forEach(o => {
-    console.log(o);
-  })
+  // result.hits.hits.forEach(o => {
+  //   console.log(o);
+  // })
 
 })()
