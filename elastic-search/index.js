@@ -1,57 +1,53 @@
 import { Client } from '@elastic/elasticsearch'
+import { parse } from './parser.js';
 
 const client = new Client({
   node: 'http://127.0.0.1:9200'
 })
 
+const index = 'knowledge'
+
 ;(async() => {
   await client.ping()
 
-  if (!client.indices.exists({
-    index: 'first_index'
+  if (!await client.indices.exists({
+    index,
   })) {
     await client.indices.create({
-      index: 'first_index'
+      index,
     })
   }
 
+  const content = await parse('./1.pdf')
 
+  await client.delete({
+    index,
+    id: 'nodejs'
+  })
   await client.index({
-    index: 'first_index',
-    // id: 'zxp',
+    index,
+    id: 'nodejs',
     document: {
-      name: 'zxp',
-      age: 20,
-      gender: true,
-      address: {
-        province: 'Guandong',
-        city: 'Shenzhen',
-      }
+      content,
     }
   })
 
-  const doc = await client.get({
-    index: 'first_index',
-    id: 'zxp'
-  })
-  console.log(doc);
-
   const result = await client.search({
+    index: 'knowledge',
     query: {
-      // match: {
-      //   name: 'zxp',
-
-      // },
       bool: {
-        must: {
+        should: {
           match: {
-            name: 'zxp'
+            content: '重大危险'
           }
         }
       }
-      
     }
   })
-  console.log(result)
+  console.log(result.hits.total)
+
+  result.hits.hits.forEach(o => {
+    console.log(o);
+  })
 
 })()
