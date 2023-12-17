@@ -1,0 +1,1 @@
+export const isRoot = Number(location.port) === 5173

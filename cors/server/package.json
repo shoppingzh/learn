@@ -1,6 +1,7 @@
 {
 	"scripts": {
-		"dev": "tsc && node ./dist/index.js"
+		"dev": "tsc && node --env-file=one.env ./dist/index.js",
+		"dev2": "tsc && node --env-file=two.env ./dist/index.js"
 	},
 	"dependencies": {
 		"koa": "^2.14.2",

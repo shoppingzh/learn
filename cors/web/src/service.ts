@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { isRoot } from './config'
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: `http://localhost:${isRoot ? '3000' : '3001'}`,
 })
 
 instance.interceptors.response.use(

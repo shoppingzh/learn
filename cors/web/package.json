@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:root": "vite --port=5174",
+    "dev": "vite --host",
+    "dev:root": "vite --host --port=5174",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
