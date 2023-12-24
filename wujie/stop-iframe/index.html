@@ -1,0 +1,49 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    iframe {
+      width: 100%;
+      height: 600px;
+      outline: none;
+      border: 1px solid #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <iframe src="./sub.html"></iframe>
+
+  <script>
+    function stopIframe(el) {
+      const window = el.contentWindow
+      const originalDoc = window.document
+      function doCheck() {
+        setTimeout(() => {
+          const doc = window.document
+          console.log(doc)
+          if (!doc || doc === originalDoc) return doCheck()
+          window.stop()
+        }, 1)
+      }
+      doCheck()
+    }
+    
+  </script>
+
+  <script>
+    const el = document.querySelector('iframe')
+    stopIframe(el)
+
+    el.addEventListener('load', () => {
+      console.log('sub iframe loaded')
+      const win = el.contentWindow
+      console.log(`a: ${win.a}`)
+      console.log(`b: ${win.b}`)
+    })
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    iframe {
+      display: block;
+      width: 100%;
+      height: 300px;
+      outline: none;
+      border: 1px solid #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <iframe></iframe>
+
+  <button onclick="replace()">替换</button>
+  
+  <script>
+    function replace() {
+      const doc = document.implementation.createHTMLDocument('hello')
+      const link = doc.createElement('a')
+      link.innerHTML = 'Vite'
+      link.href = 'https://vitejs.dev/'
+      doc.body.appendChild(link)
+
+      const iframe = document.querySelector('iframe')
+      const newRoot = iframe.contentDocument.importNode(doc.documentElement, true)
+
+      iframe.contentDocument.replaceChild(newRoot, iframe.contentDocument.documentElement)
+    }
+  </script>
+
+</body>
+</html>

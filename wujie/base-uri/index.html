@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <base href="https://google.com/search">
+</head>
+<body>
+
+  <a href="?q=hello">hello</a>
+
+
+  <script>
+    Object.defineProperty(HTMLImageElement.prototype, 'baseURI', {
+      get() {
+        return 'https://interactive-examples.mdn.mozilla.net/media/cc0-images/base'
+      },
+      set() {
+        
+      }
+    })
+    const img = document.createElement('img')
+    img.src = 'grapefruit-slice-332-332.jpg'
+    document.body.appendChild(img)
+  </script>
+
+</body>
+</html>
