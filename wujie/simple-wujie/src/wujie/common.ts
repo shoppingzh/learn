@@ -3,7 +3,7 @@ export interface Url {
   path?: string
 }
 
-export interface App {
+export interface AppContext {
   mainUrl?: Url
   appUrl?: Url
   container?: HTMLElement
@@ -16,4 +16,3 @@ export interface App {
   shadowRoot?: ShadowRoot
 
 }
-
