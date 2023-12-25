@@ -1,3 +1,5 @@
+import { Url } from "./common";
+
 /**
  * 停止窗口的运行
  * 
@@ -29,4 +31,17 @@ export function createDOM(newWindow?: Window) {
   
   const newDocEl = newWindow.document.importNode(doc.documentElement, true)
   newWindow.document.replaceChild(newDocEl, newWindow.document.documentElement)
+}
+
+/**
+ * 转换URL
+ * 
+ * @param url 
+ * @returns 
+ */
+export function getUrl(url: URL) :Url {
+  return {
+    host: url.origin,
+    path: url.pathname + url.search + url.hash,
+  }
 }
