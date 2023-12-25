@@ -37,6 +37,8 @@ export async function createIframe(options: CreateIframeOptions) {
   // 4. 插入<base>，设置baseURI为子应用路径
   createBase(iframe.contentWindow)
 
+  window.__APP.iframe = iframe
+
 
   return iframe
 }

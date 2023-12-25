@@ -6,5 +6,14 @@ export interface Url {
 export interface App {
   mainUrl?: Url
   appUrl?: Url
+  container?: HTMLElement
+
+  // js
+  iframe?: HTMLIFrameElement
+
+  // render
+  component?: HTMLElement
+  shadowRoot?: ShadowRoot
+
 }
 
