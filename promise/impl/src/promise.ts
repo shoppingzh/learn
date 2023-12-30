@@ -8,8 +8,6 @@ type State = 'pending' | 'fulfilled' | 'rejected'
 
 interface ThenInfo<T> {
   promise: MyPromise<T>
-  resolve: ResolveFn<T>
-  reject: RejectFn<T>
   onFulfilled: OnFulfilled<T>
   onRejected: OnRejected<T>
 }
@@ -22,46 +20,39 @@ export default class MyPromise<T> {
 
   protected state: State = 'pending'
   protected result: any
+  protected resolve: ResolveFn<T>
+  protected reject: RejectFn<T>
 
-  // private onFulfilledList: OnFulfilled<T>[] = []
-  // private onRejectedList: OnRejected<T>[] = []
+  // private chainPromiseList: MyPromise<unknown>[] = []
 
   private thenInfoList: ThenInfo<unknown>[] = []
 
   constructor(executor: Executor<T>) {
     if (!executor) throw new Error('executor为空')
     try {
-      const resolve = (value: T) => {
-        this.resolve(value)
+      this.resolve = (value: T) => {
+        if (this.state === 'pending') return
+        this.state = 'fulfilled'
+        this.result = value
+        this.run()
       }
-      const reject = (reason: any) => {
-        this.reject(reason)
+      this.reject = (reason: any) => {
+        if (this.state !== 'pending') return
+        this.result = reason
+        this.state = 'rejected'
+        this.run()
       }
-
-      executor(resolve, reject)
-
+      executor(this.resolve, this.reject)
     } catch (err) {
       this.reject(err)
     }
   }
 
-  private resolve(value: T) {
-    if (this.state !== 'pending') return
-    this.state = 'fulfilled'
-    this.result = value
-    this.run()
-  }
-
-  private reject(reason: any) {
-    if (this.state !== 'pending') return
-    this.result = reason
-    this.state = 'rejected'
-    this.run()
-  }
-
   private run(index?: number) {
     const list = !index ? this.thenInfoList : this.thenInfoList.slice(index, index + 1)
-    list.forEach(({ onFulfilled, onRejected, promise, resolve, reject }) => {
+    list.forEach(({ onFulfilled, onRejected, promise }) => {
+      const resolve = promise.resolve
+      const reject = promise.reject
       try {
         if (this.state === 'fulfilled') {
           if (onFulfilled) {
@@ -96,8 +87,6 @@ export default class MyPromise<T> {
 
     this.thenInfoList.push({
       promise: nextPromise,
-      resolve: nextPromiseResolve,
-      reject: nextPromiseReject,
       onFulfilled,
       onRejected,
     })
