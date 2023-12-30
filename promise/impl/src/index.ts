@@ -5,13 +5,12 @@ import MyPromise from './promise'
 
 const Promise = MyPromise
 
-let resolve: any, reject: any
-const promise = new Promise((arg1, arg2) => {
-  resolve = arg1
-  reject = arg2
-})
-
 const test = () => {
+  let resolve: any, reject: any
+  const promise = new Promise((arg1, arg2) => {
+    resolve = arg1
+    reject = arg2
+  })
   promisesAplusTests({
     // resolved(value: any) {
     //   return new Promise((resolve) => setTimeout(() => {
@@ -46,13 +45,27 @@ console.log('start')
 test()
 
 
-// new Promise((resolve, reject) => {
+// const p1 = new Promise((resolve, reject) => {
+//   resolve(1)
 //   setTimeout(() => {
 //     resolve(1)
 //   }, 1000);
-// }).then(val => {
-//   console.log(val)
+// })
+// p1.then(val => {
+//   console.log(`第一次：${val}`)
+//   return new Promise(resolve => setTimeout(() => resolve(2), 2000))
 // }, err => {
 //   console.error(err)
+// }).then(val => {
+//   console.log(val)
+// }).then(val => {
+//   console.log(val)
 // })
 
+// p1.then(val => {
+//   console.log(`第二次：${val}`)
+// })
+
+// p1.then(val => {
+//   console.log(`第三次：${val}`)
+// })

@@ -6,56 +6,50 @@ type OnRejected<T> = (reason: any) => any // TODO 改进
 
 type State = 'pending' | 'fulfilled' | 'rejected'
 
+interface ThenInfo<T> {
+  promise: MyPromise<T>
+  resolve: ResolveFn<T>
+  reject: RejectFn<T>
+  onFulfilled: OnFulfilled<T>
+  onRejected: OnRejected<T>
+}
+
+function isFunction(val: any) {
+  return val && typeof val === 'function'
+}
+
 export default class MyPromise<T> {
 
-  private state: State = 'pending'
-  private result: any
-  private onFulfilled: OnFulfilled<T>
-  private onRejected: OnRejected<T>
+  protected state: State = 'pending'
+  protected result: any
+
+  // private onFulfilledList: OnFulfilled<T>[] = []
+  // private onRejectedList: OnRejected<T>[] = []
+
+  private thenInfoList: ThenInfo<unknown>[] = []
 
   constructor(executor: Executor<T>) {
     if (!executor) throw new Error('executor为空')
-    executor((value: T) => {
-      this.resolve(value)
-    }, (reason: any) => {
-      this.reject(reason)
-    })
+    try {
+      const resolve = (value: T) => {
+        this.resolve(value)
+      }
+      const reject = (reason: any) => {
+        this.reject(reason)
+      }
+
+      executor(resolve, reject)
+
+    } catch (err) {
+      this.reject(err)
+    }
   }
 
   private resolve(value: T) {
     if (this.state !== 'pending') return
-
-    if (value instanceof MyPromise) {
-      this.state = value.state
-      value.then(val => {
-        this.result = val
-        this.run()
-      }, err => {
-        this.result = err
-        this.run()
-      })
-    } else {
-      if (typeof value === 'object' || typeof value === 'function') {
-        try {
-          const then = (value as any).then
-          then((value: T) => {
-            this.resolve(value)
-          }, (reason: any) => {
-            this.reject(reason)
-          })
-          return
-        } catch (err) {
-          this.reject(err)
-        }
-      } else {
-        this.result = value
-        this.state = 'fulfilled'
-      }
-
-      this.run()
-    }
-
-
+    this.state = 'fulfilled'
+    this.result = value
+    this.run()
   }
 
   private reject(reason: any) {
@@ -63,69 +57,94 @@ export default class MyPromise<T> {
     this.result = reason
     this.state = 'rejected'
     this.run()
-    // this.tryRun()
   }
 
-  private run() {
-    if (this.state === 'fulfilled') {
-      return this.onFulfilled?.(this.result)
-    } else if (this.state === 'rejected') {
-      return this.onRejected?.(this.result)
-    }
-  }
-
-  private tryRun() {
-
-    if (this.state === 'pending') return
-
-    if ((this.state === 'fulfilled' && !this.onFulfilled)
-      || (this.state === 'rejected' && !this.onRejected)) return this
-
-    return new MyPromise((resolve, reject) => {
-      if (this.state === 'fulfilled') {
-        queueMicrotask(() => {
-          try {
-            resolve(this.onFulfilled?.(this.result))
-          } catch (err) {
-            reject(err)
+  private run(index?: number) {
+    const list = !index ? this.thenInfoList : this.thenInfoList.slice(index, index + 1)
+    list.forEach(({ onFulfilled, onRejected, promise, resolve, reject }) => {
+      try {
+        if (this.state === 'fulfilled') {
+          if (onFulfilled) {
+            if (!isFunction(onFulfilled)) {
+              return resolve(this.result)
+            }
+            const value = onFulfilled(this.result)
+            MyPromise.resolvePromise(promise, value, resolve, reject)
           }
-        })
-      } else if (this.state === 'rejected') {
-        queueMicrotask(() => {
-          try {
-            reject(this.onRejected?.(this.result))
-          } catch (err) {
-            reject(err)
+        } else if (this.state === 'rejected') {
+          if (onRejected) {
+            if (!isFunction(onRejected)) {
+              return reject(this.result)
+            }
+            const x = onRejected(this.result)
+            MyPromise.resolvePromise(promise, x, resolve, reject)
           }
-        })
+        }
+      } catch (err) {
+        reject(err)
       }
     })
   }
 
   public then(onFulfilled?: OnFulfilled<T>, onRejected?: OnRejected<T>) {
-    this.onFulfilled = typeof onFulfilled === 'function' ? (val: T) => onFulfilled(val) : null
-    this.onRejected = typeof onRejected === 'function' ? (reason: any) => onRejected(reason) : null
+    let nextPromiseResolve: ResolveFn<any>
+    let nextPromiseReject: RejectFn<any>
+    const nextPromise = new MyPromise((resolve, reject) => {
+      nextPromiseResolve = resolve
+      nextPromiseReject = reject
+    })
 
-    return MyPromise.resolve(this.run())
+    this.thenInfoList.push({
+      promise: nextPromise,
+      resolve: nextPromiseResolve,
+      reject: nextPromiseReject,
+      onFulfilled,
+      onRejected,
+    })
+
+    if (this.state !== 'pending') {
+      this.run(this.thenInfoList.length - 1)
+    }
+
+    return nextPromise
   }
   
 
   public static resolve(value: any) {
     return value instanceof MyPromise ? value : new MyPromise((resolve, reject) => {
       resolve(value)
-      // if (typeof value === 'object' || typeof value === 'function') {
-      //   try {
-      //     const then = value.then
-      //     if (typeof then !== 'function') return resolve(then)
-
-      //     // value.then()
-      //   } catch (err) {
-      //     reject(err)
-      //   }
-      // } else {
-      //   resolve(value)
-      // }
     })
   }
+
+  private static resolvePromise<T>(promise: MyPromise<T>, x: any, resolve: ResolveFn<T>, reject: RejectFn<T>) {
+    if (promise === x) {
+      throw new TypeError('promise is equal to x')
+    }
+    if (x instanceof MyPromise) {
+      if (x.state === 'pending') {
+        promise.state = 'pending'
+        x.then(resolve, reject)
+      } else if (x.state === 'fulfilled') {
+        resolve(x.result)
+      } else if (x.state === 'rejected') {
+        reject(x.result)
+      }
+    } else if (typeof x === 'object' || isFunction(x)) {
+      try {
+        const then = x.then
+        if (!isFunction(then)) return resolve(x)
+        x.then((y: any) => {
+          MyPromise.resolvePromise(promise, y, resolve, reject)
+        }, (err: any) => {
+          reject(err)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    } else {
+      resolve(x)
+    }
+  }
+
 
 }
