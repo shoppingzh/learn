@@ -29,19 +29,19 @@ export default class MyPromise<T> {
 
   constructor(executor: Executor<T>) {
     if (!executor) throw new Error('executor为空')
+    this.resolve = (value: T) => {
+      if (this.state === 'pending') return
+      this.result = value
+      this.state = 'fulfilled'
+      this.run()
+    }
+    this.reject = (reason: any) => {
+      if (this.state !== 'pending') return
+      this.result = reason
+      this.state = 'rejected'
+      this.run()
+    }
     try {
-      this.resolve = (value: T) => {
-        if (this.state === 'pending') return
-        this.state = 'fulfilled'
-        this.result = value
-        this.run()
-      }
-      this.reject = (reason: any) => {
-        if (this.state !== 'pending') return
-        this.result = reason
-        this.state = 'rejected'
-        this.run()
-      }
       executor(this.resolve, this.reject)
     } catch (err) {
       this.reject(err)
@@ -59,16 +59,28 @@ export default class MyPromise<T> {
             if (!isFunction(onFulfilled)) {
               return resolve(this.result)
             }
-            const value = onFulfilled(this.result)
-            MyPromise.resolvePromise(promise, value, resolve, reject)
+            try {
+              const value = onFulfilled(this.result)
+              MyPromise.resolvePromise(promise, value, resolve, reject)
+            } catch (err) {
+              reject(err)
+            }
+            // queueMicrotask(() => {
+            // })
           }
         } else if (this.state === 'rejected') {
           if (onRejected) {
             if (!isFunction(onRejected)) {
               return reject(this.result)
             }
-            const x = onRejected(this.result)
-            MyPromise.resolvePromise(promise, x, resolve, reject)
+            try {
+              const x = onRejected(this.result)
+              MyPromise.resolvePromise(promise, x, resolve, reject)
+            } catch (err) {
+              reject(err)
+            }
+            // queueMicrotask(() => {
+            // })
           }
         }
       } catch (err) {
@@ -98,12 +110,6 @@ export default class MyPromise<T> {
     return nextPromise
   }
   
-
-  public static resolve(value: any) {
-    return value instanceof MyPromise ? value : new MyPromise((resolve, reject) => {
-      resolve(value)
-    })
-  }
 
   private static resolvePromise<T>(promise: MyPromise<T>, x: any, resolve: ResolveFn<T>, reject: RejectFn<T>) {
     if (promise === x) {
