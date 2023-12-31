@@ -6,7 +6,7 @@ type OnRejected<T> = (reason: any) => any // TODO 改进
 
 type State = 'pending' | 'fulfilled' | 'rejected'
 
-interface ThenInfo<T> {
+interface ThenHandler<T> {
   promise: MyPromise<T>
   onFulfilled: OnFulfilled<T>
   onRejected: OnRejected<T>
@@ -20,29 +20,28 @@ export default class MyPromise<T> {
 
   protected state: State = 'pending'
   protected result: any
+  // 将处理与拒绝函数保存在Promise内部，方便后续获取
   protected resolve: ResolveFn<T>
   protected reject: RejectFn<T>
 
-  // private chainPromiseList: MyPromise<unknown>[] = []
-
-  private thenInfoList: ThenInfo<unknown>[] = []
+  private thenHandlers: ThenHandler<unknown>[] = []
 
   constructor(executor?: Executor<T>) {
     this.resolve = (value: T) => {
       if (this.state !== 'pending') return
-      const resolve = (value: T) => {
+      const doResolve = (value: T) => {
         this.result = value
         this.state = 'fulfilled'
-        this.thenChain()
+        this.runThenHandlers()
       }
 
-      MyPromise.resolvePromise(this, value, resolve, this.reject)
+      MyPromise.resolvePromise(this, value, doResolve, this.reject)
     }
     this.reject = (reason: any) => {
       if (this.state !== 'pending') return
       this.result = reason
       this.state = 'rejected'
-      this.thenChain()
+      this.runThenHandlers()
     }
     if (executor) {
       try {
@@ -53,19 +52,21 @@ export default class MyPromise<T> {
     }
   }
 
-  private thenChain(index?: number) {
-    const list = !index ? this.thenInfoList : this.thenInfoList.slice(index, index + 1)
+  private runThenHandlers(index?: number) {
+    if (this.state === 'pending') return
+
+    const list = !index ? this.thenHandlers : this.thenHandlers.slice(index, index + 1)
     list.forEach(({ onFulfilled, onRejected, promise }) => {
-      if (this.state === 'pending') return
       const resolve = promise.resolve
       const reject = promise.reject
       try {
         if (this.state === 'fulfilled') {
           if (onFulfilled && isFunction(onFulfilled)) {
+            // 注意：将then的回调放在微任务队列里跑
             queueMicrotask(() => {
               try {
-                const value = onFulfilled(this.result)
-                MyPromise.resolvePromise(promise, value, resolve, reject)
+                const x = onFulfilled(this.result)
+                MyPromise.resolvePromise(promise, x, resolve, reject)
               } catch (err) {
                 reject(err)
               }
@@ -96,14 +97,14 @@ export default class MyPromise<T> {
   public then(onFulfilled?: OnFulfilled<T>, onRejected?: OnRejected<T>) {
     const nextPromise = new MyPromise()
 
-    this.thenInfoList.push({
+    this.thenHandlers.push({
       promise: nextPromise,
       onFulfilled,
       onRejected,
     })
 
     if (this.state !== 'pending') {
-      this.thenChain(this.thenInfoList.length - 1)
+      this.runThenHandlers(this.thenHandlers.length - 1)
     }
 
     return nextPromise
@@ -126,7 +127,7 @@ export default class MyPromise<T> {
       return
     }
 
-    // 处理的值是一个thenable，
+    // 处理的值是一个thenable，按照thenable的resolve和reject进行处理
     if (x != null && (typeof x === 'object' || isFunction(x))) {
       let called = false
       try {
@@ -150,8 +151,8 @@ export default class MyPromise<T> {
       return
     }
 
+    // 非Promise、非thenable，直接处理
     resolve(x)
   }
-
 
 }
