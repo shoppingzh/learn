@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+  <p>
+    <progress></progress>
+  </p>
+  <p>
+    <span id="text"></span>
+  </p>
+
+  <script>
+    const el = document.querySelector('progress')
+    const textEl = document.querySelector('#text')
+
+    function update(battery) {
+      const value = (battery.level || 0) * 100
+      textEl.innerHTML = `当前电量：${value}%`
+      el.setAttribute('value', value)
+    }
+    
+    navigator.getBattery().then(battery => {
+      console.log(battery)
+      update(battery)
+
+      battery.addEventListener('chargingchange', e => {
+        alert(`电源已${battery.charging ? '接入' : '断开'}`);
+      })
+      battery.addEventListener('levelchange', () => {
+        update(battery)
+      })
+    })
+
+  </script>
+  
+</body>
+</html>
