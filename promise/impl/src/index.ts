@@ -6,22 +6,7 @@ import MyPromise from './promise'
 const Promise = MyPromise
 
 const test = () => {
-  let resolve: any, reject: any
-  const promise = new Promise((arg1, arg2) => {
-    resolve = arg1
-    reject = arg2
-  })
   promisesAplusTests({
-    // resolved(value: any) {
-    //   return new Promise((resolve) => setTimeout(() => {
-    //     resolve(value)
-    //   }))
-    // },
-    // rejected(reason: any) {
-    //   return new Promise((resolve, reject) => setTimeout(() => {
-    //     reject(reason)
-    //   }))
-    // },
     resolved(value: any) {
       return new Promise((resolve) => resolve(value))
     },
@@ -29,6 +14,11 @@ const test = () => {
       return new Promise((resolve, reject) => reject(reason))
     },
     deferred() {
+      let resolve: any, reject: any
+      const promise = new Promise((arg1, arg2) => {
+        resolve = arg1
+        reject = arg2
+      })
       return {
         promise,
         resolve,
@@ -43,6 +33,19 @@ const test = () => {
 console.log('start')
 
 test()
+
+// new Promise((resolve) => {
+//   setTimeout(() => {
+//     resolve('hello')
+//   }, 50)
+// })
+//   .then(val => console.log(val))
+
+
+// new Promise((resolve) => resolve(1))
+//   .then()
+//   .then()
+//   .then(val => console.log(val))
 
 
 // const p1 = new Promise((resolve, reject) => {
