@@ -47,5 +47,21 @@ describe('', () => {
       run(new Set()) < run([])
     ).toBeTruthy()
   })
+
+  // 迭代性能：未知
+  it('iterate', () => {
+    const doIterate = (collection) => {
+      const start = +new Date()
+      for (let i of collection) {}
+      const use = +new Date() - start
+      console.log(use)
+      return use
+    }
+    const arr = new Array(1000000).fill(null).map((_, idx) => idx + 1)
+    const set = new Set(arr)
+
+    doIterate(arr)
+    doIterate(set)
+  })
   
 })
