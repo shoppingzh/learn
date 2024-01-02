@@ -1,3 +1,27 @@
+it('base', () => {
+  const set = new Set()
+  set.add(1)
+  set.add('2')
+  set.add(Symbol.iterator)
+
+  expect(set.has('2')).toBeTruthy()
+
+  set.delete('2')
+  expect(set.has('2')).toBeFalsy()
+
+  expect([...set.values()]).toEqual([1, Symbol.iterator])
+
+  const arr = []
+  for (const item of set) {
+    arr.push(item)
+  }
+  expect(arr).toEqual([1, Symbol.iterator])
+
+  set.clear()
+  expect(set.size).toBe(0)
+
+})
+
 // 直接调用，报错
 it('constructor', () => {
   expect(() => Set()).toThrow()
@@ -47,7 +71,7 @@ it('insert', () => {
 })
 
 // 迭代性能：未知
-it('iterate', () => {
+it('iterate performance', () => {
   const doIterate = (collection) => {
     const start = +new Date()
     for (let i of collection) {}
@@ -61,3 +85,4 @@ it('iterate', () => {
   doIterate(arr)
   doIterate(set)
 })
+
