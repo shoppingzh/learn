@@ -16,7 +16,7 @@ it('get', () => {
     a: 1
   }, {
     get(target, prop) {
-      if (prop === 'times') return times++
+      if (prop === 'times') return ++times
       return target[prop]
     }
   })
