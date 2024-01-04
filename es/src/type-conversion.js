@@ -1,5 +1,4 @@
 it('to-primitive', () => {
-
   expect('1' + {}).toBe('1[object Object]')
   expect('1' + {
     toString() {
@@ -13,11 +12,9 @@ it('to-primitive', () => {
   }).toBe('13')
 
   expect(Number('1' + new Date())).toBe(NaN) // Date不是number偏好
-
 })
 
 it('to-boolean', () => {
-
   const falsyList = [undefined, null, '', +0, -0, NaN, 0n]
   falsyList.forEach(falsy => {
     expect(!falsy).toBeTruthy()
@@ -27,7 +24,6 @@ it('to-boolean', () => {
   truthyList.forEach(truthy => {
     expect(!truthy).toBeFalsy()
   })
-
 })
 
 it('to-number', () => {
