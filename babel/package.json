@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "babel src --out-dir=dist"
+    "build": "babel src --out-file=dist/index.cjs"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +12,10 @@
   "devDependencies": {
     "@babel/cli": "^7.22.15",
     "@babel/core": "^7.22.17",
+    "@babel/plugin-transform-runtime": "^7.23.7",
     "@babel/preset-env": "^7.22.15"
+  },
+  "dependencies": {
+    "@babel/runtime-corejs3": "^7.23.7"
   }
 }

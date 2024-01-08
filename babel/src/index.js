@@ -9,3 +9,11 @@ console.log(a)
 console.log(b)
 
 hello()
+
+new Promise((resolve) => {
+  resolve(0)
+}).then(console.log)
+
+class Person {}
+
+'123'.includes('2')
