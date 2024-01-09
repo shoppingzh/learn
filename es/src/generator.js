@@ -31,3 +31,48 @@ it('params', () => {
   expect(it.next(3).value).toBe(9)
   expect(it.next().value).toBe(81)
 })
+
+it('yield *', () => {
+  function * foo() {
+    yield 1
+    yield* bar(5)
+  }
+  function * bar(base) {
+    let result = base ** 2
+    const x = yield result
+    yield x + result
+  }
+
+  const it = foo()
+  expect(it.next().value).toBe(1)
+  expect(it.next().value).toBe(25)
+  expect(it.next(10).value).toBe(35)
+  expect(it.next().done).toBeTruthy()
+})
+
+it('for of', () => {
+  function * foo() {
+    yield 2
+    yield 3
+    yield 5
+    yield 100
+  }
+
+  const it = foo()
+  const arr = []
+  for (let x of it) {
+    arr.push(x)
+  }
+  expect(arr).toEqual([2, 3, 5, 100])
+})
+
+it('destruct', () => {
+  function * foo() {
+    yield 2
+    yield 3
+    yield 5
+    yield 100
+  }
+  const it = foo()
+  expect([...it]).toEqual([2, 3, 5, 100])
+})
