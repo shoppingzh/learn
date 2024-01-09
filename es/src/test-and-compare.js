@@ -1,20 +1,3 @@
-const o1 = {
-  valueOf() {
-    return 1
-  },
-  toString() {
-    return '3'
-  }
-}
-const o2 = {
-  valueOf() {
-    return 1
-  },
-  toString() {
-    return '2'
-  }
-}
-
 const pairs = [
   [undefined, undefined],
   [null, null],
@@ -29,7 +12,7 @@ const pairs = [
   [Symbol(), Symbol()],
   ['', ' '],
   ['1', '1'],
-  [o1, o2],
+  [{ valueOf() { return 1 } }, { valueOf() { return 1 } }],
   [[1], [1]],
 
   // undefined
@@ -51,7 +34,7 @@ const pairs = [
 
   [undefined, {}],
   [undefined, { toString() { return undefined } }],
-  [undefined, o1],
+  [undefined, { valueOf() { return 1 } }],
 
   // null
   [null, true],
@@ -71,7 +54,7 @@ const pairs = [
 
   [null, {}],
   [null, { toString() { return null } }],
-  [null, o1],
+  [null, { valueOf() { return 1 } }],
 
   // boolean
   [true, 1],
@@ -105,6 +88,87 @@ const pairs = [
   [true, [0, 1]],
   [false, [0, 1]],
 
+  // number
+  [1, '1'],
+  [0, '0'],
+  [0, '1'],
+  [-0, '-0'],
+  [+0, '+0'],
+  [NaN, 'NaN'],
+  [NaN, '1'],
+  [Infinity, 'Infinity'],
+  [-Infinity, '-Infinity'],
+  [0, ''],
+  [0, ' '],
+  [1, { valueOf() { return 1 } }],
+  [1, { valueOf() { return '1' } }],
+  [1, { toString() { return 1 } }],
+  [1, { toString() { return '1' } }],
+  [1, [0]],
+  [1, [1]],
+  [1, [1, 2]],
+
+  // symbol
+  [Symbol.iterator, undefined],
+  [Symbol.iterator, null],
+  [Symbol.iterator, true],
+  [Symbol.iterator, false],
+  [Symbol.iterator, 0],
+  [Symbol.iterator, -0],
+  [Symbol.iterator, +0],
+  [Symbol.iterator, NaN],
+  [Symbol.iterator, Infinity],
+  [Symbol.iterator, -Infinity],
+  [Symbol.iterator, ''],
+  [Symbol.iterator, ' '],
+  [Symbol.iterator, { toString() { return Symbol.iterator } }], // true
+
+  // string
+  ['undefined', undefined],
+  ['null', null],
+  ['', false],
+  ['  ', false],
+  ['', 0],
+  ['', -0],
+  ['', +0],
+  ['', NaN],
+  ['', Infinity],
+  ['  ', 0],
+  ['  ', -0],
+  ['  ', +0],
+  ['  ', NaN],
+  ['  ', Infinity],
+  ['1', 1],
+  [' 1 ', 1],
+  ['NaN', NaN],
+  ['', {}],
+  ['', []],
+  ['  ', {}],
+  ['  ', []], // false [] -> '' / '' != '  '
+  ['1', [1]],
+  ['1', [1, 2]],
+  ['1', { valueOf() { return 1 } }],
+  ['1', { toString() { return 1 } }],
+  ['1', { valueOf() { return 1 }, toString() { return 2 } }],
+
+  // object
+  [{}, {}],
+  [{ valueOf() { return 1 } }, { toString() { return 1 } }],
+  [{ valueOf() { return '1' } }, [1]],
+  [[1], [1]],
+  [{ valueOf() { return undefined } }, undefined],
+  [{ valueOf() { return null } }, null],
+  [{ valueOf() { return 1 } }, '1'],
+  [{ toString() { return '1' } }, true],
+  [[1], undefined],
+  [[0], undefined],
+  [[0], null],
+  [[0], false],
+  [[0], 0],
+  [[0], -0],
+  [[0], +0],
+  [[NaN], NaN],
+  [[Infinity], Infinity],
 ]
 
 it('===', () => {
@@ -182,6 +246,88 @@ it('===', () => {
     false,
     false,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+
+    // number
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+
+    // symbol
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+
+    // string
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+
+    // object
     false,
     false,
     false,
@@ -297,6 +443,88 @@ it('==', () => {
     true,
     false,
     false,
+
+    // number
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+
+    // symbol
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+
+    // string
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+
+     // object
+    false,
+    false,
+    false,
+    false,
+    false, // [{ valueOf() { return undefined } }, undefined],
+    false, // [{ valueOf() { return null } }, null],
+    true, // [{ valueOf() { return 1 } }, '1'],
+    true, // [{ toString() { return '1' } }, true],
+    false, // [[1], undefined],
+    false, // [[0], undefined],
+    false, // [[0], null],
+    true, // [[0], false],
+    true, // [[0], 0],
+    true, // [[0], -0],
+    true, // [[0], +0],
+    false, // [[NaN], NaN],
+    true, // [[Infinity], Infinity],
   ]
   pairs.forEach((pair, index) => {
     console.log(pair)
