@@ -48,3 +48,17 @@ it('for of', () => {
   expect(arr).toEqual(all)
 })
 
+
+it('generator', () => {
+  const it = new ArrayIterator([1, 2, 3, 4, 5])
+  function * foo() {
+    yield * it
+  }
+  const gen = foo()
+  expect(gen.next().value).toBe(1)
+  expect(gen.next().value).toBe(2)
+  expect(gen.next().value).toBe(3)
+  expect(gen.next().value).toBe(4)
+  expect(gen.next().value).toBe(5)
+  expect(gen.next().value).toBe(undefined)
+})
