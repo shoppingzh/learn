@@ -527,7 +527,7 @@ it('==', () => {
     true, // [[Infinity], Infinity],
   ]
   pairs.forEach((pair, index) => {
-    console.log(pair)
+    // console.log(pair)
     const a = pair[0]
     const b = pair[1]
     expect(a == b).toBe(result[index])

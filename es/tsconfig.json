@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "target": "ES6"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
