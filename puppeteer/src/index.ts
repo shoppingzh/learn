@@ -13,8 +13,11 @@ import pp from 'puppeteer'
   })
   await page.goto('https://zhengxiaoping.xyz')
   await new Promise(resolve => setTimeout(resolve, 5000))
-  await page.screenshot({
-    path: './dist/screenshot.png'
+  // await page.screenshot({
+  //   path: './dist/screenshot.png'
+  // })
+  await page.pdf({
+    path: './dist/screenshot.pdf'
   })
   await browser.close()
 
