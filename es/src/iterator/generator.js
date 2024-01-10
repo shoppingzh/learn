@@ -76,3 +76,12 @@ it('destruct', () => {
   const it = foo()
   expect([...it]).toEqual([2, 3, 5, 100])
 })
+
+it('async', async() => {
+  async function wait(timeout) {
+    return await new Promise(resolve => setTimeout(() => resolve(1), timeout))
+  }
+
+  const result = await wait(10)
+  expect(result).toBe(1)
+})
