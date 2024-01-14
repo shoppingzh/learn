@@ -1,3 +1,34 @@
+it('iterator & iterable', () => {
+  // 生成器是迭代器和可迭代对象的结合体
+  function * foo() {
+    yield 1
+    yield 2
+    yield 3
+  }
+  const o = {
+    value: 0,
+    next() {
+      return {
+        done: this.value >= 3,
+        value: this.value >= 3 ? undefined : ++this.value
+      }
+    },
+    [Symbol.iterator]() {
+      return this
+    }
+  }
+  const arr1 = []
+  const arr2 = []
+  
+  for (let val of foo()) {
+    arr1.push(val)
+  }
+  for (let val of o) {
+    arr2.push(val)
+  }
+  expect(arr1).toEqual(arr2)
+})
+
 it('base', () => {
 
   function * foo() {
