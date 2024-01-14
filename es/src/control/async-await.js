@@ -64,28 +64,31 @@ it('async-await factory', async() => {
     fn(collectStep)
 
     function * gen() {
+      const args = []
       for (const step of steps) {
-        yield step()
+        const arg = yield step(...args)
+        args.push(arg)
       }
     }
 
     return run(gen())
   }
 
-  let result
   await factory((step) => {
     step(() => {
       return new Promise(resolve => {
         setTimeout(() => resolve(1), 10)
-      }).then(res => result = res)
+      })
     })
 
     step(() => {
       return new Promise(resolve => {
         setTimeout(() => resolve(2), 10)
-      }).then(res => result = res)
+      })
+    })
+
+    step((a, b) => {
+      expect(a + b).toBe(3)
     })
   })
-
-  expect(result).toBe(2)
 })
