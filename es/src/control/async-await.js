@@ -1,124 +1,94 @@
 
 async function foo() {
-  console.log(0)
-  const res1 = await new Promise(resolve => {
-    setTimeout(() => resolve(1), 3000)
+  const a = await new Promise(resolve => {
+    setTimeout(() => resolve(1), 10)
   })
-  console.log(res1);
-  const res2 = await new Promise(resolve => {
-    setTimeout(() => resolve(2), 1000)
+  const b = await new Promise(resolve => {
+    setTimeout(() => resolve(2), 10)
   })
-  console.log(res2);
+  return a + b
 }
 
-// 等同于：Promise链
-function foo2() {
+function * foo2() {
+  const a = yield new Promise(resolve => {
+    setTimeout(() => resolve(1), 10)
+  })
+  const b = yield new Promise(resolve => {
+    setTimeout(() => resolve(2), 10)
+  })
+  return a + b
+}
+
+it('base', async() => {
+  expect(await foo()).toBe(3)
+})
+
+it('genrator', () => {
+  const it = foo2()
+  expect(it.next().value.then).not.toBeUndefined()
+})
+
+it('generator + promise', (done) => {
+  const it = foo2()
+  it.next().value.then(a => {
+    it.next(a).value.then(b => {
+      expect(it.next(b).value).toBe(3)
+      done()
+    })
+  })
+})
+
+function run(it) {
   return new Promise((resolve, reject) => {
-    console.log(0)
-    new Promise(resolve => {
-      setTimeout(() => resolve(1), 3000)
-    }).then(res1 => {
-      console.log(res1)
-      new Promise(resolve => {
-        setTimeout(() => resolve(2), 1000)
-      }).then(res2 => {
-        console.log(res2)
-        resolve()
+    const doRun = (result) => {
+      if (result.done) return resolve(result.value)
+      Promise.resolve(result.value).then(val => {
+        doRun(it.next(val))
       })
-    })
+    }
+    doRun(it.next())
   })
 }
 
-// 优化Promise链：使用Genrator + Promise模拟
-function foo3() {
+it('run async generator', async() => {
+  const it = foo2()
+  expect(await run(it)).toBe(3)
+})
 
-  function * gen() {
-    console.log(0)
-    yield new Promise(resolve => {
-      setTimeout(() => resolve(1), 3000)
-    }).then(res1 => console.log(res1))
-    yield new Promise(resolve => {
-      setTimeout(() => resolve(2), 1000)
-    }).then(res2 => console.log(res2))
-  }
+it('async-await factory', async() => {
+  function factory(fn) {
+    const steps = []
+    const collectStep = (step) => {
+      steps.push(step)
+    }
+    fn(collectStep)
 
-
-  const it = gen()
-
-  function run(item) {
-    if (item.done) return
-    item.value.then(() => {
-      run(it.next())
-    })
-  }
-
-  run(it.next())
-}
-
-
-// foo()
-// foo2()
-// foo3()
-
-// 抽取
-function asyncAwait(fn) {
-  const steps = []
-
-  fn((stepFn) => {
-    steps.push(stepFn)
-  })
-
-  function * gen() {
-    while (steps.length) {
-      const stepFn = steps.shift()
-      if (stepFn) {
-        yield Promise.resolve(stepFn())
+    function * gen() {
+      const args = []
+      for (const step of steps) {
+        const arg = yield step(...args)
+        args.push(arg)
       }
     }
+
+    return run(gen())
   }
-  
-  return new Promise(resolve => {
-    const it = gen()
-  
-    function run(item) {
-      if (item.done) return resolve()
-      item.value.then(() => {
-        run(it.next())
-      })
-    }
-  
-    run(it.next())
-  })
-}
 
-
-it('impl', (done) => {
-  const steps = []
-  asyncAwait(await => {
-    console.log(0)
-  
-    await(() => {
-      steps.push(1)
-      console.log('第一步')
+  await factory((step) => {
+    step(() => {
       return new Promise(resolve => {
         setTimeout(() => resolve(1), 10)
       })
     })
-    await((res) => {
-      steps.push(2)
-      console.log('第二步')
+
+    step(() => {
       return new Promise(resolve => {
-        setTimeout(() => resolve(2), 20)
+        setTimeout(() => resolve(2), 10)
       })
     })
-    await(res2 => {
-      steps.push(3)
-      console.log('第三步')
+
+    step((a, b) => {
+      expect(a + b).toBe(3)
     })
-  
-  }).then(() => {
-    expect(steps).toEqual([1, 2, 3])
-    done()
   })
-  
 })

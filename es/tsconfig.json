@@ -3,7 +3,7 @@
     "allowJs": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
-    "target": "ES6",
+    "target": "ESNext",
     "esModuleInterop": true
   },
   "include": ["src/**/*.ts"],
